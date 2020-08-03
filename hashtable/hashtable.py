@@ -73,10 +73,15 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
-        hash_num = 5381
-        for char in key:
-            hash_num += (hash_num * 33) + ord(char)
-        return hash_num
+        # hash_num = 5381
+        # for char in key:
+        #     hash_num = (hash_num * 33) + ord(char)
+        # return hash_num
+        string_bytes = key.encode()
+        hash = 5381
+        for i in string_bytes:
+            hash = ((hash * 33) ^ i) % 0x100000000
+        return hash
 
 
     def hash_index(self, key):
@@ -186,7 +191,20 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        pass
+        new_table = HashTable(capacity=new_capacity)
+
+        # Loop through the first node of all the linked lists
+        for x in self.buckets:
+            if x == None:
+                continue
+            # Loop through all the nodes of each linked list
+            node = x
+            while node:
+                new_table.put(key=node.key,value=node.value)
+                node = node.next
+        self.capacity = new_capacity
+        self.buckets = new_table.buckets
+        return
 
 
 
