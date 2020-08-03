@@ -22,6 +22,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        self.capacity = capacity
+        self.buckets = [None] * self.capacity
+        # self.list = None
 
 
     def get_num_slots(self):
@@ -35,6 +38,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -44,6 +48,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        items = 0
+        for x in buckets:
+            if x != None:
+                items += 1
+        return items / self.capacity
 
 
     def fnv1(self, key):
@@ -54,6 +63,7 @@ class HashTable:
         """
 
         # Your code here
+        pass
 
 
     def djb2(self, key):
@@ -63,6 +73,10 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
+        hash_num = 5381
+        for char in key:
+            hash_num += (hash_num * 33) + ord(char)
+        return hash_num
 
 
     def hash_index(self, key):
@@ -83,6 +97,24 @@ class HashTable:
         """
         # Your code here
 
+        ## Linked List attempt
+        node = self._get_node(key=key)
+        if node == None:
+            node = self.buckets[self.hash_index(key=key)]
+            if node == None:
+                self.buckets[self.hash_index(key=key)] = HashTableEntry(key=key, value=value)
+                return
+            while node.next:
+                node = node.next
+            node.next = HashTableEntry(key=key, value=value)
+            return
+        else:
+            node.value = value
+            return
+
+        ## Overwrite attempt
+        # self.buckets[self.hash_index(key)] = HashTableEntry(key=key, value=value)
+
 
     def delete(self, key):
         """
@@ -93,6 +125,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        node = self._get_node(key)
+        if node == None:
+            print("Warning: Key is not found")
+        else:
+            current_node = self.buckets[self.hash_index(key=key)]
+
+            while current_node:
+                # If current node has the key and there is a next node
+                ## make the next node, the first node
+                if (current_node.key == key) and (current_node.next):
+                    self.buckets[self.hash_index(key=key)] = current_node.next
+                    return
+                # Elif current node has the key and there isn't a next node
+                elif (current_node.key == key) and (current_node.next == None):
+                    self.buckets[self.hash_index(key=key)] = None
+                    return
+                # Elif next node has the key
+                elif (current_node.next.key == key):
+                    current_node.next = current_node.next.next
+                    return
 
 
     def get(self, key):
@@ -104,6 +156,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        node = self._get_node(key=key)
+        if node == None:
+            return None
+        else:
+            return node.value
+    
+    def _get_node(self, key):
+        """
+        Retrieves the node where node.key == key
+
+        Returns None if key is not found
+        """
+        h_index = self.hash_index(key=key)
+        current_node = self.buckets[h_index]
+        while current_node != None:
+            if key == current_node.key:
+                return current_node
+            current_node = current_node.next
+        return None
+        
 
 
     def resize(self, new_capacity):
@@ -114,12 +186,13 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        pass
 
 
 
 if __name__ == "__main__":
     ht = HashTable(8)
-
+    # print(ht.buckets)
     ht.put("line_1", "'Twas brillig, and the slithy toves")
     ht.put("line_2", "Did gyre and gimble in the wabe:")
     ht.put("line_3", "All mimsy were the borogoves,")
