@@ -107,7 +107,7 @@ class HashTable:
         #return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
-    def put(self, key, value):
+    def put(self, key, value, resize:bool=False):
         """
         Store the value with the given key.
 
@@ -124,16 +124,19 @@ class HashTable:
             node = self.buckets[self.hash_index(key=key)]
             if node == None:
                 self.buckets[self.hash_index(key=key)] = HashTableEntry(key=key, value=value)
-                # self.get_load_factor()
+                if resize == False:
+                    self.get_load_factor()
                 return
             while node.next:
                 node = node.next
             node.next = HashTableEntry(key=key, value=value)
-            # self.get_load_factor()
+            if resize == False:
+                self.get_load_factor()
             return
         else:
             node.value = value
-            # self.get_load_factor()
+            if resize == False:
+                self.get_load_factor()
             return
 
         ## Overwrite attempt
@@ -222,7 +225,7 @@ class HashTable:
             # Loop through all the nodes of each linked list
             node = x
             while node:
-                new_table.put(key=node.key,value=node.value)
+                new_table.put(key=node.key,value=node.value,resize=True)
                 node = node.next
         self.capacity = new_capacity
         self.buckets = new_table.buckets
