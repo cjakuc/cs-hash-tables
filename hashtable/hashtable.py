@@ -23,7 +23,7 @@ class HashTable:
     def __init__(self, capacity):
         # Your code here
         self.capacity = capacity
-        self.buckets = [None] * self.capacity
+        self.buckets = [None] * int(self.capacity)
         # self.list = None
 
 
@@ -48,11 +48,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        items = 0
-        for x in buckets:
-            if x != None:
-                items += 1
-        return items / self.capacity
+        # Count number of keys
+        keys = 0
+        for x in self.buckets:
+            if x == None:
+                continue
+            node = x
+            while node:
+                keys += 1
+                node = node.next
+        load_factor = keys / self.capacity
+        
+        # If LF > 0.7, rehash the table to double its previous size
+        if load_factor > 0.07:
+            new_capacity = self.capacity * 2
+            self.resize(new_capacity=new_capacity)
+        elif load_factor < 0.2:
+            new_capacity = self.capacity // 2
+            self.resize(new_capacity=new_capacity)
+        load_factor = keys / self.capacity
+        return load_factor
 
 
     def fnv1(self, key):
@@ -103,18 +118,22 @@ class HashTable:
         # Your code here
 
         ## Linked List attempt
+        # Removed self.get_load_factor() because it hit recursion limit when resizing using put()
         node = self._get_node(key=key)
         if node == None:
             node = self.buckets[self.hash_index(key=key)]
             if node == None:
                 self.buckets[self.hash_index(key=key)] = HashTableEntry(key=key, value=value)
+                # self.get_load_factor()
                 return
             while node.next:
                 node = node.next
             node.next = HashTableEntry(key=key, value=value)
+            # self.get_load_factor()
             return
         else:
             node.value = value
+            # self.get_load_factor()
             return
 
         ## Overwrite attempt
@@ -141,14 +160,17 @@ class HashTable:
                 ## make the next node, the first node
                 if (current_node.key == key) and (current_node.next):
                     self.buckets[self.hash_index(key=key)] = current_node.next
+                    self.get_load_factor()
                     return
                 # Elif current node has the key and there isn't a next node
                 elif (current_node.key == key) and (current_node.next == None):
                     self.buckets[self.hash_index(key=key)] = None
+                    self.get_load_factor()
                     return
                 # Elif next node has the key
                 elif (current_node.next.key == key):
                     current_node.next = current_node.next.next
+                    self.get_load_factor()
                     return
 
 
