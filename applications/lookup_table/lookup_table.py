@@ -1,4 +1,5 @@
 # Your code here
+import math
 
 
 def slowfun_too_slow(x, y):

@@ -20,11 +20,10 @@ class HashTable:
     Implement this.
     """
 
-    def __init__(self, capacity):
+    def __init__(self, capacity:int):
         # Your code here
         self.capacity = capacity
-        self.buckets = [None] * int(self.capacity)
-        # self.list = None
+        self.buckets = [None] * self.capacity
 
 
     def get_num_slots(self):
@@ -49,24 +48,25 @@ class HashTable:
         """
         # Your code here
         # Count number of keys
-        keys = 0
+        keys_count = 0
         for x in self.buckets:
             if x == None:
                 continue
             node = x
             while node:
-                keys += 1
+                keys_count += 1
                 node = node.next
-        load_factor = keys / self.capacity
+        load_factor = keys_count / self.capacity
         
         # If LF > 0.7, rehash the table to double its previous size
         if load_factor > 0.07:
             new_capacity = self.capacity * 2
             self.resize(new_capacity=new_capacity)
+        # If LF < 0.2, rehash the table to half its previous size
         elif load_factor < 0.2:
             new_capacity = self.capacity // 2
             self.resize(new_capacity=new_capacity)
-        load_factor = keys / self.capacity
+        load_factor = keys_count / self.capacity
         return load_factor
 
 
@@ -175,6 +175,7 @@ class HashTable:
                     current_node.next = current_node.next.next
                     self.get_load_factor()
                     return
+                current_node = current_node.next
 
 
     def get(self, key):
