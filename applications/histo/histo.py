@@ -20,7 +20,9 @@ words = words.split()
 longest = 0
 for word in words:
     if word not in my_dict:
-        my_dict[word] = words.count(word)
+        my_dict[word] = 1
+    else:
+        my_dict[word] += 1
     if len(word) > longest:
         longest = len(word)
 
@@ -30,5 +32,5 @@ sorted_counts = sorted(my_dict.items(), key=lambda item: (-item[1], item[0]))
 # Print each word w/ correct number of spaces and "#"s
 for word in sorted_counts:
     spaces = " "*(longest - len(word[0]))
-    count = "#"*my_dict[word[0]]
+    count = "#"*word[1]
     print(f"{word[0]}{spaces}{count}")
